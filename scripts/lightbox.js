@@ -126,8 +126,8 @@ var initLightbox = () => {
   // Create lightbox buttons
 
   var closeBtn = setupBtn('close', 'assets/icon-close.svg', closeLightbox);
-  var nextBtn = setupBtn('next', 'assets/icon-arrow-right.svg', nextLightboxImg);
-  var prevBtn = setupBtn('prev', 'assets/icon-arrow-left.svg', prevLightboxImg);
+  var nextBtn = setupBtn('next', 'assets/icon-arrow.svg', nextLightboxImg);
+  var prevBtn = setupBtn('prev', 'assets/icon-arrow.svg', prevLightboxImg);
 
   // Build layout and listen for escape key
 

@@ -35,7 +35,8 @@
 
 .lightbox__layout {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  justify-content: space-around;
   align-items: center;
   width: 100%;
   height: 100%;
@@ -48,13 +49,41 @@
 .lightbox__img {
   max-width: 90%;
   max-height: 90%;
+  flex-shrink: 1;
+}
+
+.lightbox__close, .lightbox__next, .lightbox__prev {
+  flex-shrink: 0;
+  display: block;
+  padding: 20px;
+  width: 60px;
+  height: 60px;
+  transform-origin: center;
 }
 
 .lightbox__close {
   position: absolute;
   top: 0; right: 0;
-  padding: 20px;
-  width: 60px;
-  height: 60px;
-  cursor: pointer;
+}
+
+.lightbox__next {
+  transform: rotate(90deg);
+}
+
+.lightbox__prev {
+  transform: rotate(-90deg);
+}
+
+@media only screen and (min-width:768px) {
+  .lightbox__layout {
+    flex-direction: row;
+  }
+
+  .lightbox__next {
+    transform: rotate(0deg);
+  }
+  
+  .lightbox__prev {
+    transform: rotate(-180deg);
+  }
 }
