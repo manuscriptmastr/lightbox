@@ -1,36 +1,58 @@
 var lightbox = (images, parent) => {
 
-
-
 var body = document.querySelector('body');
-var currentImg;
+var currentIndex = 0;
 
-
-
-// Helper functions
+// Set lightbox image given an index
 
 var setLightboxImg = (index) => {
-  var currentImg = galleryImages[index];
-  lightboxImg.src = currentImg.src;
+  var img = galleryImages[index];
+  lightboxImg.src = img.src;
+  currentIndex = index;
   
   openLightbox();
 }
 
-var nextLightboxImg = (currIndex) => {
-  // Figure out index of next image and call setLightboxImg
+// Calculate indices
+
+var modulo = (num, div) => (((num % div) + div) % div);
+
+var getNewIndex = (index, count, offset) => modulo(index + offset, count);
+
+// Get index of next image and set new lightboxImg
+
+var nextLightboxImg = () => {
+  console.log('Setting next image');
+  var newIndex = getNewIndex(currentIndex, galleryImages.length, 1);
+  setLightboxImg(newIndex);
 }
 
-var prevLightboxImg = (currIndex) => {
-  // Figure out index of prev image and call setLightboxImg
+// Get index of previous image and set new lightboxImg
+
+var prevLightboxImg = () => {
+  console.log('Setting previous image');
+  var newIndex = getNewIndex(currentIndex, galleryImages.length, -1);
+  setLightboxImg(newIndex);
 }
 
 var openLightbox = () => {
+  console.log('Lightbox is open');
   body.classList.add('lightbox-is-active');
 }
 
 var closeLightbox = () => {
+  console.log('Lightbox is closed');
   body.classList.remove('lightbox-is-active');
 }
+
+// Listen for escape key to close lightbox
+
+window.addEventListener('keyup', e => {
+  e.preventDefault();
+  if(e.code === 'Escape') {
+    closeLightbox();
+  }
+});
 
 // Build lightbox wrapper
 
@@ -38,21 +60,17 @@ var lightbox = document.createElement('div');
 lightbox.classList.add('lightbox');
 body.appendChild(lightbox);
 
-
-
 // Build gallery wrapper
 
 var gallery = document.createElement('ul');
 gallery.classList.add('gallery__list');
 parent.appendChild(gallery);
 
-
-
-// Build gallery images section
+// Build gallery images section with event listeners
 
 var initGalleryImages = () => {
 
-  var imageArray = images.map(image => {
+  var imageArray = images.map((image, index) => {
     var li = document.createElement('li');
     li.classList.add('gallery__item');
   
@@ -61,7 +79,7 @@ var initGalleryImages = () => {
     img.src = image.src;
     img.alt = image.alt;
   
-    img.addEventListener('click', img => setLightboxImg(img));
+    img.addEventListener('click', e => setLightboxImg(index));
   
     li.appendChild(img);
     gallery.appendChild(li);
@@ -72,22 +90,20 @@ var initGalleryImages = () => {
   return imageArray;
 }
 
-var galleryImages = initGalleryImages();
-
-
-
-// Build lightbox with image and buttons
+// Build lightbox with image, buttons, and event listeners
 
 var initLightbox = () => {
 
-  var firstImg = galleryImages[0];
+  // Set lightbox image to first gallery image
+  var firstImg = galleryImages[currentIndex];
 
   var lightboxImg = document.createElement('img');
   lightboxImg.classList.add('lightbox__img');
   lightboxImg.src = firstImg.src;
   lightboxImg.alt = firstImg.alt;
 
-  var setupBtn = (action, src) => {
+  // Helper function to setup lightbox buttons
+  var setupBtn = (action, src, listener) => {
     var btn = document.createElement('a');
     btn.classList.add(`lightbox__${action}`);
     btn.href = '#';
@@ -98,15 +114,33 @@ var initLightbox = () => {
 
     btn.appendChild(icon);
 
+    btn.addEventListener('click', e => {
+      e.preventDefault();
+
+      listener();
+    });
+
     return btn;
   }
 
-  var closeBtn = setupBtn('close','assets/icon-close.svg');
-  var nextBtn = setupBtn('next','assets/icon-arrow-right.svg');
-  var prevBtn = setupBtn('prev','assets/icon-arrow-left.svg');
+  // Create lightbox buttons
+
+  var closeBtn = setupBtn('close', 'assets/icon-close.svg', closeLightbox);
+  var nextBtn = setupBtn('next', 'assets/icon-arrow-right.svg', nextLightboxImg);
+  var prevBtn = setupBtn('prev', 'assets/icon-arrow-left.svg', prevLightboxImg);
+
+  // Build layout and listen for escape key
 
   var layout = document.createElement('div');
   layout.classList.add('lightbox__layout');
+  layout.addEventListener('click', e => {
+    e.preventDefault();
+    if(e.target === layout) {
+      closeLightbox();
+    }
+  });
+
+  // Build lightbox
 
   var layoutChildren = [prevBtn, lightboxImg, nextBtn];
   layoutChildren.forEach(child => layout.appendChild(child));
@@ -119,8 +153,8 @@ var initLightbox = () => {
   return lightboxImg;
 }
 
+// Initialize gallery and lightbox
+var galleryImages = initGalleryImages();
 var lightboxImg = initLightbox();
-
-
 
 }
